@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { Login1 } from './components/ui/login-1';
 import { AixptPortal } from './components/aixpt-portal';
 import { System } from './types';
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [systems, setSystems] = useState<System[]>([
     {
       id: '1',
@@ -60,13 +62,16 @@ export default function App() {
     },
   ]);
 
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
   const handleSystemClick = (system: System) => {
     console.log('Opening system:', system.name);
     alert(`Opening ${system.name}`);
   };
 
   const handleAddSystem = () => {
-    // This will be handled by the portal component
     console.log('Add system triggered');
   };
 
@@ -79,6 +84,24 @@ export default function App() {
     setSystems(prev => prev.filter(s => s.id !== systemId));
   };
 
+  // Show login page if not logged in
+  if (!isLoggedIn) {
+    return (
+      <div onClick={handleLogin}>
+        <Login1 
+          heading="Welcome to AIXPT"
+          logo={{
+            url: "https://www.aixpt.com",
+            src: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=80&fit=crop&crop=center",
+            alt: "AIXPT Logo",
+            title: "AIXPT Portal",
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Show portal after login
   return (
     <AixptPortal
       systems={systems}
