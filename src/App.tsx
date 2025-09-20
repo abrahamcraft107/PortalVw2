@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Login1 } from './components/ui/login-1';
 import { AixptPortal } from './components/aixpt-portal';
 import { System } from './types';
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    // Check if user has a token in localStorage
+    return !!localStorage.getItem('portal-token');
+  });
+  
   const [systems, setSystems] = useState<System[]>([
     {
       id: '1',
@@ -62,10 +67,6 @@ export default function App() {
     },
   ]);
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
   const handleSystemClick = (system: System) => {
     console.log('Opening system:', system.name);
     alert(`Opening ${system.name}`);
@@ -84,38 +85,44 @@ export default function App() {
     setSystems(prev => prev.filter(s => s.id !== systemId));
   };
 
-  // Show login page if not logged in
-  if (!isLoggedIn) {
-    return (
-      <div className="relative">
-        <Login1 
-          heading="Welcome to AIXPT"
-          logo={{
-            url: "https://www.aixpt.com",
-            src: "https://imgur.com/a/Ju5VoXs",
-            alt: "AIXPT Logo",
-            title: "AIXPT Portal",
-          }}
-        />
-        {/* Temporary bypass button for testing */}
-        <button
-          onClick={handleLogin}
-          className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium shadow-lg z-10"
-        >
-          Bypass (Test)
-        </button>
-      </div>
-    );
-  }
-
-  // Show portal after login
   return (
-    <AixptPortal
-      systems={systems}
-      onSystemClick={handleSystemClick}
-      onAddSystem={handleAddSystem}
-      onEditSystem={handleEditSystem}
-      onDeleteSystem={handleDeleteSystem}
-    />
+    <Router>
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            isLoggedIn ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login1 
+                heading="Welcome to AIXPT"
+                logo={{
+                  url: "https://www.aixpt.com",
+                  src: "https://imgur.com/a/Ju5VoXs",
+                  alt: "AIXPT Logo",
+                  title: "AIXPT Portal",
+                }}
+              />
+            )
+          } 
+        />
+        <Route 
+          path="/dashboard" 
+          element={
+            isLoggedIn ? (
+              <AixptPortal
+                systems={systems}
+                onSystemClick={handleSystemClick}
+                onAddSystem={handleAddSystem}
+                onEditSystem={handleEditSystem}
+                onDeleteSystem={handleDeleteSystem}
+              />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          } 
+        />
+      </Routes>
+    </Router>
   );
 }
