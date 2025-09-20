@@ -92,7 +92,7 @@ export default function App() {
           heading="Welcome to AIXPT"
           logo={{
             url: "https://www.aixpt.com",
-            src: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=80&fit=crop&crop=center",
+            src: "https://imgur.com/a/Ju5VoXs",
             alt: "AIXPT Logo",
             title: "AIXPT Portal",
           }}
