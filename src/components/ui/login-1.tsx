@@ -2,7 +2,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import jwt from "jsonwebtoken";
 
 import { Button } from "./button";
 import { Input } from "./input";
@@ -72,29 +71,12 @@ const Login1 = ({
     }
   };
 
-  const devBypass = async () => {
-    setLoading(true);
-    try {
-      // Create fake JWT for development
-      const payload = {
-        clientId: "test",
-        role: "admin",
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), // 24 hours
-      };
-      
-      const fakeToken = jwt.sign(payload, "dev-secret");
-      
-      // Store in localStorage
-      localStorage.setItem("portal-token", fakeToken);
-      
-      // Navigate to dashboard
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Dev bypass failed");
-      console.error("Dev bypass error:", err);
-    } finally {
-      setLoading(false);
-    }
+  const devBypass = () => {
+    const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+    const payload = btoa(JSON.stringify({ clientId: "test", role: "admin", exp: Date.now() + 900000 }));
+    const fakeToken = `${header}.${payload}.fake-sig`;
+    localStorage.setItem("portal-token", fakeToken);
+    navigate("/dashboard");
   };
 
   return (
