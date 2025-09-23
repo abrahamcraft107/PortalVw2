@@ -7,18 +7,21 @@ import {
   List, 
   Bell, 
   Sun, 
-  Moon 
+  Moon,
+  LogOut
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { SystemCard } from './system-card';
 import { SystemCreationModal } from './system-creation-modal';
 import { EditSystemModal } from './edit-system-modal';
 import { EmailTemplate } from './templates/email-template';
+import { EmailCompleteTemplate } from './templates/email-complete-template';
 import { VocalTemplate } from './templates/vocal-template';
 import { ChatbotTemplate } from './templates/chatbot-template';
 import { PresentationTemplate } from './templates/presentation-template';
 import { cn } from '../lib/utils';
 import { System, User } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 interface AixptPortalProps {
   companyName?: string;
@@ -48,6 +51,8 @@ export const AixptPortal = ({
   const [currentView, setCurrentView] = useState<'dashboard' | 'system'>('dashboard');
   const [selectedSystem, setSelectedSystem] = useState<System | null>(null);
   const [localSystems, setLocalSystems] = useState<System[]>(systems);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     setLocalSystems(systems);
@@ -64,16 +69,23 @@ export const AixptPortal = ({
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
-  const handleCreateSystem = (type: 'email' | 'vocal' | 'chatbot' | 'presentation') => {
+  const handleLogout = () => {
+    localStorage.removeItem('portal-token');
+    navigate('/');
+  };
+
+  const handleCreateSystem = (type: 'email' | 'email-complete' | 'vocal' | 'chatbot' | 'presentation') => {
     const systemNames = {
-      email: 'Email System',
+      email: 'Email System Simple',
+      'email-complete': 'Email System Complete',
       vocal: 'Vocal System',
       chatbot: 'Chatbot',
       presentation: 'Presentation System'
     };
 
     const systemDescriptions = {
-      email: 'Email marketing and communication platform',
+      email: 'Simple email marketing and communication platform',
+      'email-complete': 'Complete email marketing and communication platform with advanced features',
       vocal: 'Voice calls and communication system',
       chatbot: 'AI-powered chat interactions',
       presentation: 'Create and manage presentations'
@@ -88,7 +100,7 @@ export const AixptPortal = ({
       lastAccessed: 'Just now',
       data: {
         // Default dummy data for each type
-        ...(type === 'email' && { emailsSent: 0 }),
+        ...((type === 'email' || type === 'email-complete') && { emailsSent: 0 }),
         ...(type === 'vocal' && { callsToday: 0, minutesToday: 0, monthlyMinutes: 0 }),
         ...(type === 'chatbot' && { messagesSent: 0 }),
         ...(type === 'presentation' && { creditsLeft: 1000, renewalDate: '2024-12-31', documentsCreated: 0 })
@@ -135,6 +147,8 @@ export const AixptPortal = ({
     switch (selectedSystem.type) {
       case 'email':
         return <EmailTemplate system={selectedSystem} onBack={handleBackToDashboard} />;
+      case 'email-complete':
+        return <EmailCompleteTemplate system={selectedSystem} onBack={handleBackToDashboard} />;
       case 'vocal':
         return <VocalTemplate system={selectedSystem} onBack={handleBackToDashboard} />;
       case 'chatbot':
@@ -184,7 +198,148 @@ export const AixptPortal = ({
                 <Bell className="h-4 w-4" />
               </Button>
 
-              <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 hover:bg-accent transition-colors"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-sm font-medium text-primary">
+                      {user.name.split(' ').map(n => n[0]).join('')}
+                    </span>
+                  </div>
+                  <div className="hidden sm:block">
+                    <p className="text-sm font-medium text-card-foreground">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                </button>
+                
+                {showUserMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Overlay to close user menu when clicking outside */}
+      {showUserMenu && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setShowUserMenu(false)}
+        />
+      )}
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground">Systems Dashboard</h2>
+            <p className="text-muted-foreground mt-1">
+              Manage and access your company systems
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* View Toggle */}
+            <div className="flex items-center rounded-lg border border-border">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="rounded-r-none border-r"
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="rounded-l-none"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Add System Button */}
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add System
+            </Button>
+          </div>
+        </div>
+
+        {/* Systems Grid/List */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-foreground">
+              Systems ({filteredSystems.length})
+            </h3>
+          </div>
+
+          {filteredSystems.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="mx-auto h-24 w-24 rounded-full bg-muted flex items-center justify-center mb-4">
+                <Settings className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No systems found</h3>
+              <p className="text-muted-foreground mb-4">
+                {searchQuery ? 'Try adjusting your search terms.' : 'Get started by adding your first system.'}
+              </p>
+              {!searchQuery && (
+                <Button onClick={() => setShowCreateModal(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add System
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className={cn(
+              viewMode === 'grid' 
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                : 'space-y-4'
+            )}>
+              {filteredSystems.map((system) => (
+                <SystemCard
+                  key={system.id}
+                  system={system}
+                  onClick={handleSystemClick}
+                  onEdit={onEditSystem}
+                  onDelete={handleDeleteSystem}
+                  onEditDescription={handleEditDescription}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Modals */}
+      <SystemCreationModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreateSystem={handleCreateSystem}
+      />
+      
+      <EditSystemModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        system={editingSystem}
+        onSave={handleSaveSystemEdit}
+      />
+    </div>
+  );
+};
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-sm font-medium text-primary">
                     {user.name.split(' ').map(n => n[0]).join('')}

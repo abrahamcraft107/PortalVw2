@@ -6,17 +6,24 @@ import { Button } from './ui/button';
 interface SystemCreationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateSystem: (type: 'email' | 'vocal' | 'chatbot' | 'presentation') => void;
+  onCreateSystem: (type: 'email' | 'email-complete' | 'vocal' | 'chatbot' | 'presentation') => void;
 }
 
 export const SystemCreationModal = ({ isOpen, onClose, onCreateSystem }: SystemCreationModalProps) => {
   const systemTypes = [
     {
       type: 'email' as const,
-      name: 'Email System',
-      description: 'Send and manage email campaigns',
+      name: 'Email System Simple',
+      description: 'Basic email marketing and communication',
       icon: Mail,
       color: 'bg-blue-500',
+    },
+    {
+      type: 'email-complete' as const,
+      name: 'Email System Complete',
+      description: 'Advanced email marketing with full features',
+      icon: Mail,
+      color: 'bg-blue-600',
     },
     {
       type: 'vocal' as const,
@@ -41,7 +48,7 @@ export const SystemCreationModal = ({ isOpen, onClose, onCreateSystem }: SystemC
     },
   ];
 
-  const handleCreateSystem = (type: 'email' | 'vocal' | 'chatbot' | 'presentation') => {
+  const handleCreateSystem = (type: 'email' | 'email-complete' | 'vocal' | 'chatbot' | 'presentation') => {
     onCreateSystem(type);
     onClose();
   };

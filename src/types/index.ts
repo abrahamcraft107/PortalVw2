@@ -2,7 +2,7 @@ export interface System {
   id: string;
   name: string;
   description?: string;
-  type: 'email' | 'vocal' | 'chatbot' | 'presentation';
+  type: 'email' | 'email-complete' | 'vocal' | 'chatbot' | 'presentation';
   status: 'active' | 'inactive' | 'maintenance';
   lastAccessed?: string;
   data?: SystemData;
