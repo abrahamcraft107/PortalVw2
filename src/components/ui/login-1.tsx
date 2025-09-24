@@ -18,6 +18,7 @@ interface Login1Props {
   googleText?: string;
   signupText?: string;
   signupUrl?: string;
+  onLoginSuccess?: () => void;
 }
 
 const Login1 = ({
@@ -32,6 +33,7 @@ const Login1 = ({
   googleText = "Sign up with Google",
   signupText = "Don't have an account?",
   signupUrl = "#",
+  onLoginSuccess,
 }: Login1Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,6 +60,8 @@ const Login1 = ({
       if (data.status === "YES" && data.token) {
         // Save token to localStorage
         localStorage.setItem("portal-token", data.token);
+        // Update parent component state
+        onLoginSuccess?.();
         // Navigate to dashboard
         navigate("/dashboard");
       } else {
@@ -76,6 +80,8 @@ const Login1 = ({
     const payload = btoa(JSON.stringify({ clientId: "test", role: "admin", exp: Date.now() + 900000 }));
     const fakeToken = `${header}.${payload}.fake-sig`;
     localStorage.setItem("portal-token", fakeToken);
+    // Update parent component state
+    onLoginSuccess?.();
     navigate("/dashboard");
   };
 

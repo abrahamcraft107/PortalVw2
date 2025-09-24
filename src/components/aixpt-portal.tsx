@@ -31,6 +31,7 @@ interface AixptPortalProps {
   onAddSystem?: () => void;
   onEditSystem?: (system: System) => void;
   onDeleteSystem?: (systemId: string) => void;
+  onLogout?: () => void;
 }
 
 export const AixptPortal = ({
@@ -41,6 +42,7 @@ export const AixptPortal = ({
   onAddSystem,
   onEditSystem,
   onDeleteSystem,
+  onLogout,
 }: AixptPortalProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -69,8 +71,11 @@ export const AixptPortal = ({
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
     localStorage.removeItem('portal-token');
+    // Update parent component state first
+    onLogout?.();
+    // Then navigate
     navigate('/');
   };
 
@@ -217,7 +222,7 @@ export const AixptPortal = ({
                 {showUserMenu && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-50">
                     <button
-                      onClick={handleLogout}
+                      onClick={handleLogoutClick}
                       className="w-full px-4 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                     >
                       <LogOut className="h-4 w-4" />

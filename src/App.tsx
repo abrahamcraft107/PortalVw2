@@ -67,6 +67,13 @@ export default function App() {
     },
   ]);
 
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
   const handleSystemClick = (system: System) => {
     console.log('Opening system:', system.name);
     alert(`Opening ${system.name}`);
@@ -96,6 +103,7 @@ export default function App() {
             ) : (
               <Login1 
                 heading="Welcome to AIXPT"
+                onLoginSuccess={handleLogin}
                 logo={{
                   url: "https://www.aixpt.com",
                   src: "https://imgur.com/a/Ju5VoXs",
@@ -116,6 +124,7 @@ export default function App() {
                 onAddSystem={handleAddSystem}
                 onEditSystem={handleEditSystem}
                 onDeleteSystem={handleDeleteSystem}
+                onLogout={handleLogout}
               />
             ) : (
               <Navigate to="/" replace />
