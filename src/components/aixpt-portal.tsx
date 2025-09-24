@@ -220,7 +220,7 @@ export const AixptPortal = ({
                 </button>
                 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-[60]">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-50">
                     <button
                       onClick={handleLogoutClick}
                       className="w-full px-4 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
@@ -239,7 +239,7 @@ export const AixptPortal = ({
       {/* Overlay to close user menu when clicking outside */}
       {showUserMenu && (
         <div 
-          className="fixed inset-0 z-50" 
+          className="fixed inset-0 z-40" 
           onClick={() => setShowUserMenu(false)}
         />
       )}
